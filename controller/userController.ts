@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import db from "../config/firebase";
-import { User } from "../types/types";
+import db from "../config/firebaseConfig";
+import { User } from "../entities/types";
 
 const userDb = "users";
 
@@ -8,18 +8,22 @@ export const updateUserData = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { id, name, email, age }: User = req.body;
-
-  if (!id || !name || !email || !age) {
-    res.status(400).json({ error: "All fields are required" });
-    return;
-  }
+  const { name, email, age }: User = req.body;
+  const { id } = req.params;
 
   try {
     const userRef = db.collection(userDb).doc(id);
+    const doc = await userRef.get();
+
+    if (!doc.exists) {
+      res.status(400).json({ error: "User with said ID doesn't exist" });
+    }
+
     await userRef.set({ name, email, age }, { merge: true });
 
-    res.status(200).json({ message: "User data updated successfully" });
+    const updatedDoc = (await userRef.get()).data();
+
+    res.status(200).json(updatedDoc);
   } catch (err) {
     res.status(500).json({ error: "Failed to update user data" });
   }
@@ -38,7 +42,6 @@ export const fetchUserData = async (
           ...doc.data(),
         } as User)
     );
-
 
     res.status(200).json(users);
   } catch (err) {

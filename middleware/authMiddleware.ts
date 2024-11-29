@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import * as admin from "firebase-admin";
-import { User } from "../types/types";
+import { User } from "../entities/types";
 
 export const authMiddleware = async (
-  req: Request,
+  req: Request & { user?: User },
   res: Response,
   next: NextFunction
 ) => {
@@ -19,8 +19,8 @@ export const authMiddleware = async (
       // Continue with the decodedToken
       const user: User = {
         id: decodedToken.uid, // Firebase `uid` maps to your `id`
-        name: decodedToken.name || "Default Name", // You may get the `name` from your DB or Firebase profile
-        age: decodedToken.age || 30, // Example: If `age` is not in Firebase token, assign a default or fetch from DB
+        name: decodedToken.name , // You may get the `name` from your DB or Firebase profile
+        age: decodedToken.age, // Example: If `age` is not in Firebase token, assign a default or fetch from DB
         email: decodedToken.email || "janedoe@gmail.com",
       };
       req.user = user;
