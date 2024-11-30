@@ -17,6 +17,7 @@ export const updateUserData = async (
 
     if (!doc.exists) {
       res.status(400).json({ error: "User with said ID doesn't exist" });
+      return;
     }
 
     await userRef.set({ name, email, age }, { merge: true });
@@ -44,6 +45,41 @@ export const fetchUserData = async (
     );
 
     res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch user data" });
+  }
+};
+
+export const fetchSingleUserData = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { id } = req.params;
+
+  console.log(id);
+
+  try {
+    const snapshot = await db.collection(userDb).doc(id).get();
+    console.log(!snapshot.exists);
+    if (!snapshot.exists) {
+      res.status(400).send("User not found");
+      return;
+    }
+
+    const { name, email, age } = snapshot.data() as {
+      name: string;
+      email: string;
+      age: number;
+    };
+
+    const user: User = {
+      id: snapshot.id,
+      name,
+      email,
+      age,
+    };
+
+    res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch user data" });
   }

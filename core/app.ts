@@ -35,7 +35,7 @@ const swaggerOptions = {
         },
       },
   },
-  apis: ['./routes/userRoutes*.ts']
+  apis: ['./routes/userRoutes*.ts','./swagger.yaml']
 }
 
 const app: Application = express();

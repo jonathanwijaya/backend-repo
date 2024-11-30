@@ -1,11 +1,10 @@
 import * as admin from "firebase-admin";
 import { serviceAccount } from "../service-account";
-
-console.log(serviceAccount);
+import "dotenv/config";
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-  databaseURL: "https://backend-ebuddy-a11db-default-rtdb.firebaseio.com/"
+  databaseURL: process.env.DATABASE_URL
 });
 
 const db = admin.firestore();
